@@ -10,8 +10,8 @@ COPY requirements.txt .
 # Устанавливаем Python зависимости (кэшируется если requirements.txt не менялся)
 RUN pip install -r requirements.txt
 
-# Копируем код сервера в контейнер
-COPY server/ .
+# Копируем ВЕСЬ проект (и сервер и тесты) в контейнер
+COPY . .
 
-# Команда для запуска FastAPI сервера
-CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"]
+# Ждем 5 секунд чтобы сервер успел запуститься, затем запускаем тесты
+CMD ["sh", "-c", "sleep 5 && pytest tests/ -v"]
