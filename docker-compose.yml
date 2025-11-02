@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15  # Готовый образ PostgreSQL с Docker Hub
+    container_name: my-postgres-db  # Имя контейнера
+    environment:
+      POSTGRES_DB: mydatabase      # Создает базу при первом запуске
+      POSTGRES_USER: myuser        # Создает пользователя
+      POSTGRES_PASSWORD: mypassword # Пароль пользователя
+    ports:
+      - "5432:5432"  # Пробрасываем порт 5432 на локальную машину
+    volumes:
+      - postgres_data:/var/lib/postgresql/data  # Постоянное хранилище данных БД
+      - ./init-scripts:/docker-entrypoint-initdb.d  # Скрипты выполняются при ПЕРВОМ запуске
+    restart: unless-stopped  # Автоперезапуск при падении
+
+volumes:
+  postgres_data:  # Том для хранения данных БД (сохраняется между перезапусками)
