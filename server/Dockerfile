@@ -4,11 +4,9 @@ FROM python:3.11
 # Устанавливаем рабочую директорию внутри контейнера
 WORKDIR /app
 
-# Копируем файл с зависимостями в контейнер
-COPY requirements.txt .
-
-# Устанавливаем Python зависимости (кэшируется если requirements.txt не менялся)
-RUN pip install -r requirements.txt
+# Копируем и устанавливаем ТОЛЬКО серверные зависимости
+COPY requirements-server.txt .
+RUN pip install -r requirements-server.txt
 
 # Копируем код сервера в контейнер
 COPY server/ .
