@@ -1,19 +1,33 @@
 version: '3.8'
 
 services:
+  # Сервис базы данных PostgreSQL
   postgres:
-    image: postgres:15  # Готовый образ PostgreSQL с Docker Hub
-    container_name: my-postgres-db  # Имя контейнера
+    image: postgres:15  # официальный образ PostgreSQL
+    container_name: my-postgres-db  # имя контейнера
     environment:
-      POSTGRES_DB: mydatabase      # Создает базу при первом запуске
-      POSTGRES_USER: myuser        # Создает пользователя
-      POSTGRES_PASSWORD: mypassword # Пароль пользователя
+      POSTGRES_DB: mydatabase      # создаем базу данных при запуске
+      POSTGRES_USER: myuser        # создаем пользователя
+      POSTGRES_PASSWORD: mypassword # задаем пароль
     ports:
-      - "5432:5432"  # Пробрасываем порт 5432 на локальную машину
+      - "5432:5432"  # пробрасываем порт 5432 на хост-машину
     volumes:
-      - postgres_data:/var/lib/postgresql/data  # Постоянное хранилище данных БД
-      - ./init-scripts:/docker-entrypoint-initdb.d  # Скрипты выполняются при ПЕРВОМ запуске
-    restart: unless-stopped  # Автоперезапуск при падении
+      - postgres_data:/var/lib/postgresql/data  # том для хранения данных БД
+      - ./init-scripts:/docker-entrypoint-initdb.d  # скрипты инициализации
+    restart: unless-stopped  # автоматически перезапускаться при падении
 
+  # Сервис нашего FastAPI сервера
+  server:
+    build:
+      context: .  # контекст сборки - корневая папка проекта
+      dockerfile: server/Dockerfile  # путь к Dockerfile
+    container_name: my-fastapi-server
+    ports:
+      - "8000:8000"  # пробрасываем порт 8000 для доступа к API
+    depends_on:
+      - postgres  # запускать только после запуска БД
+    restart: unless-stopped
+
+# Определяем тома для хранения данных
 volumes:
-  postgres_data:  # Том для хранения данных БД (сохраняется между перезапусками)
+  postgres_data:  # том для данных PostgreSQL (сохраняется между перезапусками)
