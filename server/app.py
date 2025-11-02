@@ -1,14 +1,17 @@
 from fastapi import FastAPI
 import psycopg2
 from psycopg2.extras import RealDictCursor
+import os
 
 # Создаем приложение FastAPI
 app = FastAPI(title="User API")
 
 def get_db_connection():
     """Функция для подключения к базе данных"""
+    # Автоматически определяем хост: в Docker - "postgres", локально - "localhost"
+    db_host = os.getenv("DB_HOST", "localhost")
     return psycopg2.connect(
-        host="postgres",      # имя сервиса из docker-compose.yml
+        host=db_host,  # 👈 теперь работает в обоих режимах
         database="mydatabase", # название базы данных
         user="myuser",        # пользователь
         password="mypassword", # пароль
